@@ -204,8 +204,6 @@ func OnChatBotMessageReceived(ctx context.Context, data *chatbot.BotCallbackData
 			title = strings.Join(fullTitle[0:i], "")
 		}
 		content := strings.Join(fullContent[0:i], "")
-		fmt.Println(title)
-		fmt.Println(content)
 
 		updateRequest := &dingtalkim_1_0.UpdateRobotInteractiveCardRequest{
 			CardBizId: tea.String(cardInstanceId),
