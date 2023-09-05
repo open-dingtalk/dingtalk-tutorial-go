@@ -1,4 +1,4 @@
-module bot_echo
+module bot_echo_text
 
 go 1.19
 

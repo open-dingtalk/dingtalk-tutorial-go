@@ -25,6 +25,9 @@ func main() {
 	flag.StringVar(&clientId, "client_id", "", "your-client-id")
 	flag.StringVar(&clientSecret, "client_secret", "", "your-client-secret")
 	flag.Parse()
+	if len(clientId) == 0 || len(clientSecret) == 0 {
+		panic("command line options --client_id and --client_secret required")
+	}
 
 	logger.SetLogger(logger.NewStdTestLogger())
 
