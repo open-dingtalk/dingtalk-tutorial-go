@@ -4,4 +4,5 @@ use (
 	./bot_echo_markdown
 	./bot_echo_text
 	./bot_echo_streaming
+	event
 )
