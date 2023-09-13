@@ -12,6 +12,11 @@ import (
 
 func OnEventReceived(_ context.Context, df *payload.DataFrame) (*payload.DataFrameResponse, error) {
 	eventHeader := event.NewEventHeaderFromDataFrame(df)
+	if eventHeader.EventType != "user_add_org" {
+		// ignore events not equals `user_add_org`; 忽略`user_add_org`之外的其他事件；
+		// 该示例仅演示 user_add_org 类型的事件订阅；
+		return event.NewSuccessResponse()
+	}
 
 	logger.GetLogger().Infof("received event, delay=%s, eventType=%s, eventId=%s, eventBornTime=%d, eventCorpId=%s, eventUnifiedAppId=%s, data=%s",
 		time.Duration(time.Now().UnixMilli()-eventHeader.EventBornTime)*time.Millisecond,
@@ -22,11 +27,7 @@ func OnEventReceived(_ context.Context, df *payload.DataFrame) (*payload.DataFra
 		eventHeader.EventUnifiedAppId,
 		df.Data)
 
-	response := payload.NewSuccessDataFrameResponse()
-	if err := response.SetJson(event.NewEventProcessResultSuccess()); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return event.NewSuccessResponse()
 }
 
 func main() {
