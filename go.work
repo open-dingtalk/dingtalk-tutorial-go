@@ -2,7 +2,7 @@ go 1.19
 
 use (
 	./bot_echo_markdown
-	./bot_echo_text
 	./bot_echo_streaming
-	./event_add_user
+	./bot_echo_text
+	./event_chat_update
 )

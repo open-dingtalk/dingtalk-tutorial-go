@@ -12,9 +12,9 @@ import (
 
 func OnEventReceived(_ context.Context, df *payload.DataFrame) (*payload.DataFrameResponse, error) {
 	eventHeader := event.NewEventHeaderFromDataFrame(df)
-	if eventHeader.EventType != "user_add_org" {
-		// ignore events not equals `user_add_org`; 忽略`user_add_org`之外的其他事件；
-		// 该示例仅演示 user_add_org 类型的事件订阅；
+	if eventHeader.EventType != "chat_update_title" {
+		// ignore events not equals `chat_update_title`; 忽略`chat_update_title`之外的其他事件；
+		// 该示例仅演示 chat_update_title 类型的事件订阅；
 		return event.NewSuccessResponse()
 	}
 
@@ -26,6 +26,7 @@ func OnEventReceived(_ context.Context, df *payload.DataFrame) (*payload.DataFra
 		eventHeader.EventCorpId,
 		eventHeader.EventUnifiedAppId,
 		df.Data)
+	// put your code here; 可以在这里添加你的业务代码，处理事件订阅的业务逻辑；
 
 	return event.NewSuccessResponse()
 }

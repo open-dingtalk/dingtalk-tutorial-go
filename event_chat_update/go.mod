@@ -1,4 +1,4 @@
-module event_add_user
+module event_chat_update
 
 go 1.19
 
