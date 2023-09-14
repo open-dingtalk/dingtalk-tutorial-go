@@ -33,8 +33,8 @@ func OnEventReceived(_ context.Context, df *payload.DataFrame) (*payload.DataFra
 
 func main() {
 	var clientId, clientSecret string
-	flag.StringVar(&clientId, "client_id", "", "your-client-id")
-	flag.StringVar(&clientSecret, "client_secret", "", "your-client-secret")
+	flag.StringVar(&clientId, "client_id", "", "your-client-id, AppKey or SuiteKey")
+	flag.StringVar(&clientSecret, "client_secret", "", "your-client-secret, AppSecret or SuiteSecret")
 	flag.Parse()
 	if len(clientId) == 0 || len(clientSecret) == 0 {
 		panic("command line options --client_id and --client_secret required")
