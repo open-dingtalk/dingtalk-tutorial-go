@@ -4,5 +4,6 @@ use (
 	./bot_echo_markdown
 	./bot_echo_streaming
 	./bot_echo_text
+	./bot_card_callback
 	./event_chat_update
 )
