@@ -20,10 +20,7 @@ func main() {
 
 	logger.SetLogger(logger.NewStdTestLogger())
 
-	cli := client.NewStreamClient(
-		client.WithAppCredential(client.NewAppCredentialConfig(clientId, clientSecret)),
-		client.WithOpenApiHost("https://pre-api.dingtalk.com"),
-	)
+	cli := client.NewStreamClient(client.WithAppCredential(client.NewAppCredentialConfig(clientId, clientSecret)))
 
 	agiPlugin := receiver.NewAgiPlugin(corpId, clientId, clientSecret)
 	cli.RegisterPluginCallbackRouter(agiPlugin.OnIncomingRequest)
