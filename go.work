@@ -6,4 +6,5 @@ use (
 	./bot_echo_text
 	./bot_card_callback
 	./event_chat_update
+	./message_api
 )

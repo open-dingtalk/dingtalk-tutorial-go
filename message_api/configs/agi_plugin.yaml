@@ -1,0 +1,61 @@
+openapi: 3.0.1
+info:
+  title: 钉钉AI助理消息处理
+  description: 钉钉AI助理消息处理
+  version: v1.0.0
+x-dingtalk-protocol: stream
+paths:
+  /v1/actions/message/receiver:
+    get:
+      description: 消息收发验证
+      summary: 消息收发验证
+      operationId: GetAgiAgentMessage
+      x-dingtalk-display-result: disabled  # 关闭钉钉官方卡片
+      x-dingtalk-card-template-id: e135583f-b9fc-4090-996d-f3119bd47f1a.schema
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetAgiAgentMessageRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAgiAgentMessageRequest'
+components:
+  schemas:
+    GetAgiAgentMessageRequest:
+      type: object
+      properties:
+        senderUnionId:
+          type: string
+          description: 用户ID
+          x-dingtalk-context:
+            property: currentUser
+            format: unionId
+        openConversationId:
+          type: string
+          description: 当前会话
+          x-dingtalk-context:
+            property: currentConversation
+            format: openConversationId
+        sessionWebhook:
+          type: string
+          description: 会话凭证
+          x-dingtalk-context: ## 获取卡片相关的运行上下文（sessionWebhook）
+            property: currentConversation
+            format: sessionWebhook
+        senderCorpId:
+          type: string
+          description: 用户corpId
+          x-dingtalk-context:
+            property: currentOrg
+            format: corpId
+    GetAgiAgentMessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: 消息
