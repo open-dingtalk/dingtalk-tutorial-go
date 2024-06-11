@@ -1,10 +1,11 @@
-go 1.19
+go 1.22.3
 
 use (
+	./bot_card_callback
 	./bot_echo_markdown
 	./bot_echo_streaming
 	./bot_echo_text
-	./bot_card_callback
 	./event_chat_update
 	./message_api
+	assistant_reply_message
 )
