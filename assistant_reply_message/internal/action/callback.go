@@ -32,7 +32,7 @@ func (h *CallbackHandler) OnPluginCallback(c context.Context, req *plugin.GraphR
 	msg1 := models.MessageContent{
 		ContentType: models.ContentTypeAiCard,
 		Content: models.CardContent{
-			TemplateID: models.DingTalkAiCardTemplateId,
+			TemplateID: models.DingTalkAiCardNonStream,
 			CardData: models.CardData{
 				"content": "白日依山尽，黄河入海流。欲穷千里目，更上一层楼。",
 			},
