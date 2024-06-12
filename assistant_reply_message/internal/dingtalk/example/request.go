@@ -3,7 +3,6 @@ package example
 import (
 	"assistant_reply_message/internal/dingtalk/models"
 	"encoding/json"
-	"github.com/open-dingtalk/dingtalk-stream-sdk-go/logger"
 )
 
 type RawExampleRequest struct {
@@ -17,6 +16,7 @@ type RawExampleRequest struct {
 	Location           string `json:"location"`
 	UserId             string `json:"userId"`
 	OpenConversationId string `json:"openConversationId"`
+	ConversationToken  string `json:"conversationToken"`
 }
 
 type WeatherRequest struct {
@@ -41,6 +41,7 @@ type CurrentOrg struct {
 type CurrentConversation struct {
 	SessionWebhook     string `json:"sessionWebhook"`
 	OpenConversationId string `json:"openConversationId"`
+	ConversationToken  string `json:"conversationToken"`
 }
 
 type ExampleRequest struct {
@@ -75,13 +76,12 @@ func NewExampleRequest(requestBody string) (*ExampleRequest, error) {
 		CurrentConversation: CurrentConversation{
 			SessionWebhook:     rawRequest.SessionWebhook,
 			OpenConversationId: rawRequest.OpenConversationId,
+			ConversationToken:  rawRequest.ConversationToken,
 		},
 	}
-	input := models.UserInputAttribute{}
-	if err := json.Unmarshal([]byte(rawRequest.InputAttribute), &input); err != nil {
+	if err := json.Unmarshal([]byte(rawRequest.InputAttribute), &req.CurrentInput.InputAttribute); err != nil {
 		return nil, err
 	}
-	req.CurrentInput.InputAttribute = input
-	logger.GetLogger().Infof("input=%s", rawRequest.InputAttribute)
+
 	return req, nil
 }

@@ -77,6 +77,11 @@ components:
           x-dingtalk-context:
             property: currentConversation
             format: sessionWebhook
+        conversationToken:
+          type: string
+          x-dingtalk-context:
+            property: currentConversation
+            format: conversationToken
     GetWeatherResponse:
       type: object
       properties:

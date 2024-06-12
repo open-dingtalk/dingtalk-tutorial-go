@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/open-dingtalk/dingtalk-stream-sdk-go/logger"
 	"io"
 	"net/http"
@@ -175,4 +176,35 @@ func (c *Client) getAccessTokenFromAPI() (*models.GetTokenResponse, error) {
 		return nil, errors.New(response.ErrorMessage)
 	}
 	return response, nil
+}
+
+func (c *Client) SendAiCardStream(unionId, templateId, key, value string) error {
+	accessToken, err := c.GetAccessToken()
+
+	cardContent := models.CardContent{
+		TemplateID: templateId,
+	}
+	cardContentBytes, err := json.Marshal(cardContent)
+	if err != nil {
+		return err
+	}
+	prepareRequest := map[string]any{
+		"unionId":     unionId,
+		"contentType": "ai_card",
+		"content":     string(cardContentBytes),
+	}
+	requestBodyBytes, err := json.Marshal(prepareRequest)
+	httpClient := http.Client{Timeout: defaultTimeout}
+	req, err := http.NewRequest("POST", "https://api.dingtalk.com/v1.0/aiInteraction/prepare", bytes.NewReader(requestBodyBytes))
+	req.Header.Set("x-acs-dingtalk-access-token", accessToken)
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println("%s", string(responseBody))
+	return nil
 }
