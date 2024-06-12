@@ -50,7 +50,7 @@ func (h *CallbackHandler) OnPluginCallback(c context.Context, req *plugin.GraphR
 		msg2 := example.NewAiCardStreamContent(models.DingTalkAiCardStream, "content", "白日依山尽，黄河入海流。欲穷千里目，更上一层楼。", true)
 		replyMessage("webhook, stream ai card", exampleRequest.CurrentConversation.SessionWebhook, msg2)
 	}
-	h.dingtalkClient.SendAiCardStream(exampleRequest.CurrentUser.UnionId, models.DingTalkAiCardStream, "content", "白日依山尽，黄河入海流。欲穷千里目，更上一层楼。白日依山尽，黄河入海流。欲穷千里目，更上一层楼。白日依山尽，黄河入海流。欲穷千里目，更上一层楼。白日依山尽，黄河入海流。欲穷千里目，更上一层楼。")
+	h.dingtalkClient.SendAiCardStream(exampleRequest.CurrentUser.UnionId, models.DingTalkAiCardStream, "content", "白日依山尽，黄河入海流。欲穷千里目，更上一层楼。")
 
 	weather := utils.GetWeather()
 	return utils.CreateSuccessResponse(weather), nil
