@@ -2,6 +2,7 @@ package client
 
 import (
 	"assistant_reply_message/internal/dingtalk/models"
+	"assistant_reply_message/internal/utils"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -10,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"sync"
 	"time"
 )
@@ -181,6 +183,7 @@ func (c *Client) getAccessTokenFromAPI() (*models.GetTokenResponse, error) {
 func (c *Client) SendAiCardStream(unionId, templateId, key, value string) error {
 	accessToken, err := c.GetAccessToken()
 
+	// prepare
 	cardContent := models.CardContent{
 		TemplateID: templateId,
 	}
@@ -194,9 +197,12 @@ func (c *Client) SendAiCardStream(unionId, templateId, key, value string) error 
 		"content":     string(cardContentBytes),
 	}
 	requestBodyBytes, err := json.Marshal(prepareRequest)
+	fmt.Println(accessToken)
+	fmt.Printf("%s\n", string(requestBodyBytes))
 	httpClient := http.Client{Timeout: defaultTimeout}
 	req, err := http.NewRequest("POST", "https://api.dingtalk.com/v1.0/aiInteraction/prepare", bytes.NewReader(requestBodyBytes))
 	req.Header.Set("x-acs-dingtalk-access-token", accessToken)
+	req.Header.Set("Content-Type", "application/json")
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return err
@@ -205,6 +211,117 @@ func (c *Client) SendAiCardStream(unionId, templateId, key, value string) error 
 	if err != nil {
 		return err
 	}
-	fmt.Println("%s", string(responseBody))
+	fmt.Printf("%s\n", string(responseBody))
+	prepareResult := &models.InteractResult[models.PrepareResponse]{}
+	if err := json.Unmarshal(responseBody, prepareResult); err != nil {
+		return err
+	}
+	// update
+	cardContent = models.CardContent{
+		TemplateID: templateId,
+		CardData: models.CardData{
+			"key":        key,
+			"value":      value,
+			"isFinalize": false,
+		},
+		Options: map[string]any{
+			"componentTag": "streamingComponent",
+		},
+	}
+	cardContentBytes, err = json.Marshal(cardContent)
+	if err != nil {
+		return err
+	}
+	updateRequest := map[string]any{
+		"conversationToken": prepareResult.Result.ConversationToken,
+		"contentType":       "ai_card",
+		"content":           string(cardContentBytes),
+	}
+	requestBodyBytes, err = json.Marshal(updateRequest)
+	if err != nil {
+		return err
+	}
+	req, err = http.NewRequest("POST", "https://api.dingtalk.com/v1.0/aiInteraction/update", bytes.NewReader(requestBodyBytes))
+	req.Header.Set("x-acs-dingtalk-access-token", accessToken)
+	req.Header.Set("Content-Type", "application/json")
+	debugMsg := utils.DumpRequest(req, requestBodyBytes)
+	os.WriteFile("/tmp/update.txt", []byte(debugMsg), 0666)
+	logger.GetLogger().Infof("debug: \n%s", debugMsg)
+	resp, err = httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	responseBody, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	updateResult := &models.InteractResult[models.UpdateResponse]{}
+	if err := json.Unmarshal(responseBody, updateResult); err != nil {
+		return err
+	}
+	// update2
+	cardContent = models.CardContent{
+		TemplateID: templateId,
+		CardData: models.CardData{
+			"key":        key,
+			"value":      value,
+			"isFinalize": true,
+		},
+		Options: map[string]any{
+			"componentTag": "streamingComponent",
+		},
+	}
+	cardContentBytes, err = json.Marshal(cardContent)
+	if err != nil {
+		return err
+	}
+	updateRequest = map[string]any{
+		"conversationToken": prepareResult.Result.ConversationToken,
+		"contentType":       "ai_card",
+		"content":           string(cardContentBytes),
+	}
+	requestBodyBytes, err = json.Marshal(updateRequest)
+	if err != nil {
+		return err
+	}
+	req, err = http.NewRequest("POST", "https://api.dingtalk.com/v1.0/aiInteraction/update", bytes.NewReader(requestBodyBytes))
+	req.Header.Set("x-acs-dingtalk-access-token", accessToken)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err = httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	responseBody, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	updateResult = &models.InteractResult[models.UpdateResponse]{}
+	if err := json.Unmarshal(responseBody, updateResult); err != nil {
+		return err
+	}
+	// finish
+	finishRequest := map[string]any{
+		"conversationToken": prepareResult.Result.ConversationToken,
+	}
+	requestBodyBytes, err = json.Marshal(finishRequest)
+	if err != nil {
+		return err
+	}
+	req, err = http.NewRequest("POST", "https://api.dingtalk.com/v1.0/aiInteraction/finish", bytes.NewReader(requestBodyBytes))
+	req.Header.Set("x-acs-dingtalk-access-token", accessToken)
+	req.Header.Set("Content-Type", "application/json")
+	logger.GetLogger().Infof("debug: \n%s", debugMsg)
+	resp, err = httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	responseBody, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	finishResult := &models.InteractResult[models.FinishResponse]{}
+	if err := json.Unmarshal(responseBody, finishResult); err != nil {
+		return err
+	}
 	return nil
 }
